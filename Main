@@ -1,0 +1,174 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TAM 1000
+
+typedef struct
+{
+    char Nome[25];
+    char nota01[50];
+    char nota02[50];
+
+} Aluno;
+
+
+void inicioList(Aluno *lista, int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++)
+    {
+        strcpy(lista[i].Nome,"");
+        strcpy(lista[i].nota01,"");
+        strcpy(lista[i].nota02,"");
+
+    }
+}
+
+void copyAluno(Aluno *lista, int n, char *nomeArquivo)
+{
+    FILE *procurador = fopen(nomeArquivo,"a");
+    int i;
+
+
+    for (i = 0; i < n; i++)
+    {
+
+        if (strcmp(lista[i].Nome,"") == 0)
+        {
+            break;
+        }
+
+        fprintf(procurador, "%s ", lista[i].Nome);
+        fprintf(procurador, "%s ", lista[i].nota01);
+        fprintf(procurador, "%s\n", lista[i].nota02);
+
+        fflush(procurador);
+    }
+
+    fclose(procurador);
+}
+
+void InserirAluno(Aluno *lista, int n)
+{
+    int i;
+    FILE *procurador = fopen("HistoricoAluno.txt","a");
+    char Nome[10];
+
+    printf("Nome : ");
+    scanf("%s", Nome);
+    fflush(stdin);
+
+    for (i = 0; i < n; i++)
+    {
+
+        if (strcmp(lista[i].Nome, Nome) == 0)
+        {
+            printf("Nome já cadastrada, tente novamente!\n");
+            break;
+        }
+
+        if (strcmp(lista[i].Nome,"") == 0)
+        {
+            printf("Posição do aluno será:  %d.\n", i);
+
+            strcpy(lista[i].Nome, Nome);
+
+            fflush(stdin              );
+            printf("Nota 01: "           );
+            scanf("%s",lista[i].nota01  );
+
+            fflush(stdin              );
+            printf("Nota 02: "    );
+            scanf("%s", lista[i].nota02);
+
+            fprintf(procurador, "%s ", lista[i].Nome);
+            fprintf(procurador, "%s ", lista[i].nota01     );
+            fprintf(procurador, "%s\n", lista[i].nota02    );
+            break;
+        }
+    }
+    fclose(procurador);
+
+    if (i == n) printf("Historico Cheio!\n");
+}
+
+int pega_do_arquivoTXT(Aluno *lista, int n)
+{
+    FILE *fp = fopen("HistoricoAluno.txt","r");
+    if(fp == NULL)return 0;
+    int i=0;
+    while(fscanf(fp,"%s",&lista[i].Nome)!= EOF &&
+            fscanf(fp,"%s",&lista[i].nota01     )!= EOF &&
+            fscanf(fp,"%s",&lista[i].nota02    )!= EOF )
+    {
+        i++;
+    }
+    return 1;
+}
+
+void exibeAlunos(Aluno *lista, int n)
+{
+    int i;
+
+    for (i = 0; i < n; i++)
+    {
+        if (strcmp(lista[i].Nome,"") == 0)
+        {
+            break;
+        }
+        printf("Nome: %s\n", lista[i].Nome);
+        printf("Nota 01 ------: %s\n", lista[i].nota01     );
+        printf("Nota 02 -----: %s\n", lista[i].nota02    );
+        printf("#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#\n");
+    }
+}
+
+
+int main()
+{
+    Aluno lista[TAM];
+    int opcao,r;
+
+    inicioList(lista, TAM);
+    r = pega_do_arquivoTXT(lista,TAM);
+
+    do
+    {
+        printf("1 - Inserir Aluno\n");
+        printf("2 - Listar Alunos\n");
+        printf("3 - Remover Aluno\n");
+        printf("4 - Sair\n");
+        printf("Opçao: ");
+        scanf("%d", &opcao);
+
+        switch (opcao)
+        {
+        case 1 :
+            printf("Dados do Aluno: \n\n");
+            InserirAluno(lista,TAM);
+            r=1;
+            break;
+
+        case 2 :
+            printf("\nExibição de Alunos: \n\n");
+            if( r )exibeAlunos(lista, TAM);
+            else printf("Adicione um dado para ser apresentado!");
+            printf("\n\n");
+            break;
+        case 3 :
+            break;
+        case 4 :
+            break;
+        default :
+            printf("Opção invalida!\n");
+        }
+
+    }
+    while (opcao != 4);
+
+
+
+    return 1;
+}
